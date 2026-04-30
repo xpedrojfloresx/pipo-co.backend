@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_CLUSTER}/${process.env.MONGO_DB}`;
+const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_CLUSTER}/${process.env.MONGO_DB}?retryWrites=true&w=majority`;
 
 const clientOptions = {
     serverApi: {
