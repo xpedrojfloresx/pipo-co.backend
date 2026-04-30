@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f9fdf9; margin: 0; padding: 0; }
+        .wrapper { width: 100%; background-color: #f9fdf9; padding: 40px 0; }
+        .container { max-width: 500px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; border: 1px solid #e0eadd; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+        .header { padding: 30px 20px; text-align: center; }
+        .content { padding: 0 32px 32px 32px; color: #4a4a4a; }
+        h2 { color: #5d7e51; font-size: 20px; margin-bottom: 6px; }
+        .subtitle { font-size: 14px; color: #8fa388; margin-bottom: 24px; }
+        .section-title { font-size: 13px; font-weight: bold; color: #5d7e51; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+        .info-box { background-color: #f9fdf9; border: 1px solid #e0eadd; border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; font-size: 14px; line-height: 1.8; color: #4a4a4a; }
+        .items-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 16px; }
+        .items-table td { padding: 8px 0; border-bottom: 1px solid #e0eadd; color: #4a4a4a; }
+        .items-table td:last-child { text-align: right; font-weight: bold; color: #5d7e51; }
+        .total-row { background-color: #f1f5ef; border-radius: 8px; padding: 12px 16px; display: flex; justify-content: space-between; font-size: 15px; font-weight: bold; color: #5d7e51; margin-bottom: 24px; }
+        .footer { padding: 20px; background-color: #f1f5ef; font-size: 12px; color: #8fa388; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="header" style="padding:30px 20px; text-align:center;">
+                <img src="{{logo}}" alt="Pipo &amp; Co" width="200" style=" margin:0 auto; width:200px; height:auto;"/>
+            </div>
+            <div class="content">
+                <h2>¡Gracias por tu pedido, {{nombre}}!</h2>
+                <p class="subtitle">Recibimos tu pedido! Ponte en contacto con nosotros para coordinar el pago y la entrega.</p>
+
+                <p class="section-title">Datos de contacto</p>
+                <div class="info-box">
+                    <strong>Nombre:</strong> {{nombre}}<br>
+                    <strong>Email:</strong> {{email}}<br>
+                    <strong>Direccion:</strong> {{direccion}}, {{ciudad}}, {{provincia}} ({{cp}})<br>
+                    <strong>Modalidad:</strong> {{modalidad}}
+                </div>
+
+                <p class="section-title">Productos</p>
+                <table class="items-table">
+                    {{items}}
+                </table>
+
+                <div class="total-row">
+                    <span>Total</span>
+                    <span>{{total}}</span>
+                </div>
+
+                <div style="text-align:center;">
+                    <a href="{{whatsapp_url}}" style="display:inline-block; background-color:#25D366; color:#ffffff; padding:12px 32px; border-radius:8px; font-weight:bold; font-size:15px; text-decoration:none;">
+                        Contactar por WhatsApp
+                    </a>
+                    <p style="font-size:12px; color:#8fa388; margin-top:12px;">
+                        Al hacer click se abre WhatsApp con el resumen de tu pedido listo para enviar.
+                    </p>
+                </div>
+            </div>
+            <div class="footer">
+                Enviamos a todo Cordoba &mdash; &copy; 2026 Pipo &amp; Co. Todos los derechos reservados.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

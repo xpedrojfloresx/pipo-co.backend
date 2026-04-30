@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos inline para mejor compatibilidad */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9fdf9;
+            margin: 0;
+            padding: 0;
+        }
+        .wrapper {
+            width: 100%;
+            background-color: #f9fdf9;
+            padding: 40px 0;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e0eadd;
+            overflow: hidden;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+        .header {
+            padding: 30px 20px;
+        }
+        .logo-text {
+            color: #5d7e51; /* El verde oscuro de tu logo */
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .content {
+            padding: 0 40px 40px 40px;
+            color: #4a4a4a;
+        }
+        h2 {
+            color: #5d7e51;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #93c47d; /* El verde del botón "Ingresar" */
+            color: #ffffff !important;
+            padding: 14px 40px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .footer {
+            padding: 20px;
+            background-color: #f1f5ef;
+            font-size: 12px;
+            color: #8fa388;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="header">
+                <img src="{{logo}}" alt="Pipo &amp; Co" style="max-width:200px; height:auto;"/>
+            </div>
+            <div class="content">
+                <h2>¡Hola, {{nombre}}!</h2>
+                <p>Tu cuenta ha sido creada con éxito en <strong>Pipo & Co</strong>. Ya podés acceder a nuestro catálogo y gestionar tus pedidos.</p>
+                <a href="https://tupagina.com/login" class="btn">Ingresar a mi cuenta</a>
+            </div>
+            <div class="footer">
+                Enviamos a todo Córdoba 🚚 <br>
+                &copy; 2026 Pipo & Co. Todos los derechos reservados.
+            </div>
+        </div>
+    </div>
+</body>
+</html>
