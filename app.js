@@ -22,6 +22,10 @@ app.get('/', (req, res) => {
     res.send('Backend is running');
 });
 
+app.get('/api/ping', (req, res) => {
+  res.status(200).send('pong');
+});
+
 app.use('/api/usuarios', usuariosRouter);
 app.use('/api/productos', productosRouter);
 app.use('/api/pedidos', pedidosRouter);
