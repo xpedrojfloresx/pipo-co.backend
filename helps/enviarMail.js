@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -9,22 +9,34 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const LOGO_URL = `${process.env.FRONTEND_URL}/Logo-LetrasVerdes.png`;
+const crearTransporter = () => nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    secure: false,
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
+});
 
 export const enviarMail = async (nombre, email) => {
     console.log(`Iniciando proceso de envío para: ${nombre}`);
     try {
         const templatePath = path.join(__dirname, '..', 'templates', 'welcomeMail.html');
+        const logoPath = path.join(__dirname, '..', 'assets', 'Logo-LetrasVerdes.png');
         const html = fs.readFileSync(templatePath, 'utf8')
             .replace('{{nombre}}', nombre)
-            .replace('{{logo}}', LOGO_URL);
+            .replace('{{logo}}', 'cid:logo');
 
-        await resend.emails.send({
-            from: `${process.env.SMTP_NAME} <${process.env.RESEND_FROM}>`,
+        await crearTransporter().sendMail({
+            from: `"${process.env.SMTP_NAME}" <${process.env.SMTP_FROM}>`,
             to: email,
             subject: '¡Bienvenido! Tu cuenta ha sido creada',
             html,
+            attachments: [{ filename: 'logo.png', path: logoPath, cid: 'logo' }],
         });
 
         console.log('✅ Email de bienvenida enviado');
@@ -36,6 +48,7 @@ export const enviarMail = async (nombre, email) => {
 export const enviarMailPedido = async ({ datosEnvio, items, total }) => {
     try {
         const templatePath = path.join(__dirname, '..', 'templates', 'pedidoMail.html');
+        const logoPath = path.join(__dirname, '..', 'assets', 'Logo-LetrasVerdes.png');
         let html = fs.readFileSync(templatePath, 'utf8');
 
         const itemsHtml = items.map(item =>
@@ -52,7 +65,7 @@ export const enviarMailPedido = async ({ datosEnvio, items, total }) => {
         const whatsappUrl = `https://wa.me/5493517707999?text=${encodeURIComponent(mensajeWp)}`;
 
         html = html
-            .replace('{{logo}}', LOGO_URL)
+            .replace('{{logo}}', 'cid:logo')
             .replace(/{{nombre}}/g, datosEnvio.nombre)
             .replace('{{email}}', datosEnvio.email)
             .replace('{{direccion}}', datosEnvio.direccion)
@@ -64,11 +77,12 @@ export const enviarMailPedido = async ({ datosEnvio, items, total }) => {
             .replace('{{total}}', `$${total.toLocaleString('es-AR')}`)
             .replace('{{whatsapp_url}}', whatsappUrl);
 
-        await resend.emails.send({
-            from: `${process.env.SMTP_NAME} <${process.env.RESEND_FROM}>`,
+        await crearTransporter().sendMail({
+            from: `"${process.env.SMTP_NAME}" <${process.env.SMTP_FROM}>`,
             to: datosEnvio.email,
             subject: 'Confirmacion de pedido - Pipo & Co',
             html,
+            attachments: [{ filename: 'logo.png', path: logoPath, cid: 'logo' }],
         });
 
         console.log('✅ Mail de pedido enviado');
