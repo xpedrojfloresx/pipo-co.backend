@@ -4,6 +4,8 @@ import morgan from 'morgan';
 import usuariosRouter from './routes/usersRoutes.js';
 import productosRouter from './routes/productosRoutes.js';
 import pedidosRouter from './routes/pedidosRoutes.js';
+import adminRouter from './routes/adminRoutes.js';
+import resenasRouter from './routes/resenasRoutes.js';
 
 const app = express();
 
@@ -29,5 +31,7 @@ app.get('/api/ping', (req, res) => {
 app.use('/api/usuarios', usuariosRouter);
 app.use('/api/productos', productosRouter);
 app.use('/api/pedidos', pedidosRouter);
+app.use('/api/admin', adminRouter);
+app.use('/api/resenas', resenasRouter);
 
 export default app;

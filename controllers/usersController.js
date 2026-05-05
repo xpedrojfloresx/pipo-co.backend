@@ -1,125 +1,85 @@
 import { validationResult } from "express-validator";
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import UsuarioCollection from '../models/usersModels.js';
 import { enviarMail } from '../helps/enviarMail.js';
 
 const registrarUsuario = async (req, res) => {
-
     const errors = validationResult(req);
-
     if (!errors.isEmpty()) {
         return res.status(400).json({
             message: errors.array().map(item => item.msg).join(', ')
         });
     }
 
-    const nombre = req.body.nombre;
-    const email = req.body.email;
-    const password = req.body.password;
-
-    const persona = {
-        nombre,
-        email,
-        password,
-    }
-
-    const guardarUsuario = async () => {
-        try {
-            // Antes de gauardar los datos, encriptamos el password
-            const salt = await bcrypt.genSalt(10);
-            // impriimos la salt
-            console.log(salt);
-            persona.password = await bcrypt.hash(password, salt);
-            console.log(persona.password);
-
-            // Creamos una instancia del modelo de usuario con los datos recibidos
-            const usuarioNuevo = new UsuarioCollection(persona);
-
-            // Guardamos el usuario en la base de datos
-            await usuarioNuevo.save();
-
-            // enviar un mail al user 
-            await enviarMail(nombre, email);
-
-            res.status(200).json({
-                message: 'Usuario registrado con éxito',
-            });
-        } catch (error) {
-
-            console.log(error);
-
-            res.status(500).json({
-                message: 'Error al guardar el usuario'
-            });
-        }
-    }
-
-    await guardarUsuario();
-}
-
-const loginUsuario = async (req, res) => {
-
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-        return res.status(400).json({
-            message: errors.array().map(item => item.msg).join(', ')
-        });
-    }
-
-    const emailUsuario = req.body.email;
-    const passwordUsuario = req.body.password;
+    const { nombre, email, password } = req.body;
 
     try {
-        const usuario = await UsuarioCollection.findOne({ email: emailUsuario });
+        const salt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash(password, salt);
 
-        console.log(usuario);
+        const usuarioNuevo = new UsuarioCollection({ nombre, email, password: passwordHash });
+        await usuarioNuevo.save();
+        await enviarMail(nombre, email);
 
+        res.status(200).json({ message: 'Usuario registrado con éxito' });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Error al guardar el usuario' });
+    }
+};
+
+const loginUsuario = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            message: errors.array().map(item => item.msg).join(', ')
+        });
+    }
+
+    const { email, password } = req.body;
+
+    try {
+        const usuario = await UsuarioCollection.findOne({ email });
         if (!usuario) {
-            return res.status(400).json({
-                message: 'El usuario no existe'
-            });
+            return res.status(400).json({ message: 'El usuario no existe' });
         }
 
-        const passwordValido = await bcrypt.compare(passwordUsuario, usuario.password);
-
-        console.log(passwordValido);
-
+        const passwordValido = await bcrypt.compare(password, usuario.password);
         if (!passwordValido) {
-            return res.status(400).json({
-                message: 'La contraseña es incorrecta'
-            });
+            return res.status(400).json({ message: 'La contraseña es incorrecta' });
         }
+
+        const token = jwt.sign({ id: usuario._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
         res.status(200).json({
             message: 'Login exitoso',
+            token,
             user: {
                 id: usuario._id,
                 nombre: usuario.nombre,
                 email: usuario.email,
+                rol: usuario.rol,
             }
         });
-
     } catch (error) {
         console.log(error);
-        res.status(500).json({
-            message: 'Error interno del servidor'
-        });
+        res.status(500).json({ message: 'Error interno del servidor' });
     }
-}
+};
 
 const obtenerUsuarios = async (req, res) => {
     try {
-        const usuarios = await UsuarioCollection.find();
+        const usuarios = await UsuarioCollection.find().select('-password');
         res.status(200).json(usuarios);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Error al obtener los usuarios' });
     }
-}
+};
 
 export {
     obtenerUsuarios,
     registrarUsuario,
-    loginUsuario
-}
+    loginUsuario,
+};

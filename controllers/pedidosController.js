@@ -1,6 +1,6 @@
 import { validationResult } from 'express-validator';
 import PedidoModel from '../models/pedidosModels.js';
-import { enviarMailPedido } from '../helps/enviarMail.js';
+import { enviarMailPedido, enviarMailConfirmacionAdmin } from '../helps/enviarMail.js';
 
 const crearPedido = async (req, res) => {
     const errors = validationResult(req);
@@ -13,12 +13,17 @@ const crearPedido = async (req, res) => {
     const { usuarioId, items, total, datosEnvio } = req.body;
 
     try {
-        const nuevoPedido = new PedidoModel({ usuario: usuarioId, items, total, datosEnvio });
+        // Generar número de orden secuencial
+        const ultimoPedido = await PedidoModel.findOne().sort({ nroOrden: -1 }).select('nroOrden');
+        const nroOrden = (ultimoPedido?.nroOrden ?? 0) + 1;
+
+        const nuevoPedido = new PedidoModel({ usuario: usuarioId, items, total, datosEnvio, nroOrden });
         await nuevoPedido.save();
 
         await enviarMailPedido({ datosEnvio, items, total });
+        await enviarMailConfirmacionAdmin({ nroOrden, datosEnvio, items, total });
 
-        res.status(201).json({ message: 'Pedido creado con éxito', pedido: nuevoPedido });
+        res.status(201).json({ message: 'Pedido creado con éxito', pedido: nuevoPedido, nroOrden });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Error al crear el pedido' });
@@ -28,6 +33,7 @@ const crearPedido = async (req, res) => {
 const obtenerPedidos = async (req, res) => {
     try {
         const pedidos = await PedidoModel.find()
+            .sort({ nroOrden: -1 })
             .populate('usuario', 'nombre email')
             .populate('items.productoId', 'name img');
         res.status(200).json(pedidos);
@@ -40,6 +46,7 @@ const obtenerPedidos = async (req, res) => {
 const obtenerPedidosPorUsuario = async (req, res) => {
     try {
         const pedidos = await PedidoModel.find({ usuario: req.params.usuarioId })
+            .sort({ nroOrden: -1 })
             .populate('items.productoId', 'name img');
         res.status(200).json(pedidos);
     } catch (error) {

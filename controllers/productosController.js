@@ -4,7 +4,13 @@ import ProductoModel from '../models/productosModels.js';
 const obtenerProductos = async (req, res) => {
     try {
         const productos = await ProductoModel.find();
-        res.status(200).json(productos);
+        const productosPublicos = productos.map(p => {
+            const obj = p.toObject();
+            obj.agotado = obj.stock <= 0;
+            delete obj.stock;
+            return obj;
+        });
+        res.status(200).json(productosPublicos);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Error al obtener los productos' });

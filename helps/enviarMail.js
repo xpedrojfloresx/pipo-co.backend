@@ -45,6 +45,52 @@ export const enviarMail = async (nombre, email) => {
     }
 };
 
+export const enviarMailConfirmacionAdmin = async ({ nroOrden, datosEnvio, items, total }) => {
+    const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_FROM;
+    console.log(`📧 Enviando mail admin a: ${adminEmail} — pedido #${nroOrden}`);
+    try {
+        const templatePath = path.join(__dirname, '..', 'templates', 'adminPedidoMail.html');
+        const logoPath = path.join(__dirname, '..', 'assets', 'Logo-LetrasVerdes.png');
+        let html = fs.readFileSync(templatePath, 'utf8');
+
+        const itemsHtml = items.map(item =>
+            `<tr><td>${item.nombre} x${item.cantidad}</td><td>$${(item.precio * item.cantidad).toLocaleString('es-AR')}</td></tr>`
+        ).join('');
+
+        const modalidadTexto = datosEnvio.modalidad === 'retiro' ? 'Retiro en local' : 'Envío a domicilio';
+        const fecha = new Date().toLocaleString('es-AR', { dateStyle: 'long', timeStyle: 'short' });
+
+        html = html
+            .replace('{{logo}}', 'cid:logo')
+            .replace('{{nroOrden}}', nroOrden)
+            .replace('{{fecha}}', fecha)
+            .replace(/{{nombre}}/g, datosEnvio.nombre)
+            .replace('{{email}}', datosEnvio.email)
+            .replace('{{telefono}}', datosEnvio.telefono)
+            .replace('{{direccion}}', datosEnvio.direccion)
+            .replace('{{ciudad}}', datosEnvio.ciudad)
+            .replace('{{provincia}}', datosEnvio.provincia)
+            .replace('{{provincia}}', datosEnvio.provincia)
+            .replace('{{cp}}', datosEnvio.cp)
+            .replace('{{modalidad}}', modalidadTexto)
+            .replace('{{items}}', itemsHtml)
+            .replace('{{total}}', `$${total.toLocaleString('es-AR')}`);
+
+        const info = await crearTransporter().sendMail({
+            from: `"${process.env.SMTP_NAME}" <${process.env.SMTP_FROM}>`,
+            to: adminEmail,
+            subject: `🛒 Nuevo pedido recibido #${nroOrden} — ${datosEnvio.nombre}`,
+            html,
+            attachments: [{ filename: 'logo.png', path: logoPath, cid: 'logo' }],
+        });
+
+        console.log(`✅ Mail admin enviado — pedido #${nroOrden} — messageId: ${info.messageId}`);
+    } catch (err) {
+        console.error('❌ Error en enviarMailConfirmacionAdmin:', err.message);
+        console.error('❌ Detalle completo:', err);
+    }
+};
+
 export const enviarMailPedido = async ({ datosEnvio, items, total }) => {
     try {
         const templatePath = path.join(__dirname, '..', 'templates', 'pedidoMail.html');
@@ -68,6 +114,7 @@ export const enviarMailPedido = async ({ datosEnvio, items, total }) => {
             .replace('{{logo}}', 'cid:logo')
             .replace(/{{nombre}}/g, datosEnvio.nombre)
             .replace('{{email}}', datosEnvio.email)
+            .replace('{{telefono}}', datosEnvio.telefono)
             .replace('{{direccion}}', datosEnvio.direccion)
             .replace('{{ciudad}}', datosEnvio.ciudad)
             .replace('{{provincia}}', datosEnvio.provincia)

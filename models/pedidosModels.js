@@ -29,8 +29,13 @@ const pedidoSchema = new mongoose.Schema({
     },
     estado: {
         type: String,
-        enum: ['pendiente', 'confirmado', 'enviado', 'entregado', 'cancelado'],
+        enum: ['pendiente', 'confirmado', 'enviado', 'entregado', 'finalizado', 'cancelado'],
         default: 'pendiente',
+    },
+    nroOrden: {
+        type: Number,
+        unique: true,
+        sparse: true,
     },
     fecha: {
         type: Date,
