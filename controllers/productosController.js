@@ -7,6 +7,7 @@ const obtenerProductos = async (req, res) => {
         const productosPublicos = productos.map(p => {
             const obj = p.toObject();
             obj.agotado = obj.stock <= 0;
+            obj.stockDisponible = obj.stock > 0 ? obj.stock : 0;
             delete obj.stock;
             return obj;
         });

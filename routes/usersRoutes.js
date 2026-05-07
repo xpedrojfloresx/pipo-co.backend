@@ -17,7 +17,7 @@ router.post('/registro',
   [
     body("nombre", "El nombre es obligatorio").isString().trim().notEmpty(),
     body("email", "El email es obligatorio").isEmail().trim().notEmpty(),
-    body("password", "La contraseña es obligatoria, minimo 6 caracteres y maximo 12 caracteres").isAlphanumeric().trim().notEmpty().isLength({ min: 6, max: 12 }),
+    body("password", "La contraseña es obligatoria, mínimo 6 caracteres").trim().notEmpty().isLength({ min: 6 }),
   ],
   registrarUsuario);
 
@@ -27,7 +27,7 @@ router.post('/registro',
 //Post para el login
 router.post('/login', [
   body("email", "El email es obligatorio").isEmail().trim().notEmpty(),
-  body("password", "La contraseña es obligatoria").isAlphanumeric().trim().notEmpty().isLength({ min: 6, max: 12 }),
+  body("password", "La contraseña es obligatoria").trim().notEmpty().isLength({ min: 6 }),
 ], loginUsuario);
 
 // Exportamos el router
